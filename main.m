@@ -6,8 +6,12 @@
 
 void detect_rootlessJB()
 {
-    if(access("/var/JB", F_OK)==0) {
+    if(access("/var/jb", F_OK)==0) {
         NSLog(@"rootless JB found!");
+    }
+    
+    if(access("/private/preboot/jb", F_OK)==0) {
+        NSLog(@"Fugu15 JB found!");
     }
     
     if(access("/var/containers/Bundle/dylib", F_OK)==0) {
@@ -65,6 +69,10 @@ void detect_bootstraps()
         NSLog(@"dpkg found!");
     }
     
+    if(access("/var/lib", F_OK)==0) {
+        NSLog(@"var lib found!");
+    }
+    
     if(access("/var/lib/apt", F_OK)==0) {
         NSLog(@"apt found!");
     }
@@ -85,6 +93,10 @@ void detect_trollStoredFilza()
     }
     
     if(access("/var/mobile/Library/Filza", F_OK)==0) {
+        NSLog(@"trollStoredFilza found!");
+    }
+    
+    if(access("/var/mobile/Library/Preferences/com.tigisoftware.Filza.plist", F_OK)==0) {
         NSLog(@"trollStoredFilza found!");
     }
 }
@@ -123,6 +135,9 @@ void detect_proc_flags()
     }
     if(flags & 0x00000008) {
         NSLog(@"unexcept installer!");
+    }
+    if(!(flags & 0x00000300)) {
+        NSLog(@"jit-allow found!");
     }
     if(flags & 0x00004000) {
         NSLog(@"unexcept entitlements!");
