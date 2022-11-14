@@ -17,6 +17,9 @@ void detect_rootlessJB()
     if(access("/var/containers/Bundle/dylib", F_OK)==0) {
         NSLog(@"xina JB found!");
     }
+    if(access("/var/containers/Bundle/xina", F_OK)==0) {
+        NSLog(@"xina JB found!");
+    }
 }
 
 void detect_kernBypass()
@@ -112,7 +115,7 @@ static mach_port_t connect_mach_service(const char *name) {
 void detect_jailbreakd()
 {
     if(connect_mach_service("cy:com.saurik.substrated")) {
-        NSLog(@"substrated found!");
+        NSLog(@"checkra1n substrated found!");
     }
     
     if(connect_mach_service("org.coolstar.jailbreakd")) {
@@ -144,7 +147,6 @@ void detect_proc_flags()
     }
 }
 
-
 //#import "AppDelegate.h"
 int main(int argc, char * argv[])
 {
@@ -159,12 +161,11 @@ int main(int argc, char * argv[])
     detect_jailbreakd();
     detect_proc_flags();
     
-    
 //    NSString * appDelegateClassName;
 //    @autoreleasepool {
 //        // Setup code that might create autoreleased objects goes here.
 //        appDelegateClassName = NSStringFromClass([AppDelegate class]);
 //    }
 //    return UIApplicationMain(argc, argv, nil, appDelegateClassName);
-//    
+
 }
