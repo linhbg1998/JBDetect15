@@ -147,6 +147,22 @@ void detect_proc_flags()
     }
 }
 
+void detect_jb_payload()
+{
+    mach_port_t object_name;
+    mach_vm_size_t region_size=0;
+    mach_vm_address_t region_base = (uint64_t)vm_region_64;
+
+    vm_region_basic_info_data_64_t info = {0};
+    mach_msg_type_number_t info_cnt = VM_REGION_BASIC_INFO_COUNT_64;
+
+    vm_region_64(mach_task_self(), (vm_address_t*)&region_base, (vm_size_t*)&region_size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&info, &info_cnt, &object_name);
+    
+    if(info.protection != VM_PROT_READ) {
+        NSLog(@"jb payload injected!");
+    }
+}
+
 //#import "AppDelegate.h"
 int main(int argc, char * argv[])
 {
@@ -160,6 +176,7 @@ int main(int argc, char * argv[])
     detect_trollStoredFilza();
     detect_jailbreakd();
     detect_proc_flags();
+    detect_jb_payload();
     
 //    NSString * appDelegateClassName;
 //    @autoreleasepool {
