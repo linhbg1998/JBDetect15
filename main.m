@@ -20,6 +20,16 @@ void detect_rootlessJB()
     if(access("/var/containers/Bundle/xina", F_OK)==0) {
         NSLog(@"xina JB found!");
     }
+    
+    char* varfiles[] = {
+        "apt","bin","bzip2","cache","dpkg","etc","gzip","lib","Lib","libexec","Library","LIY","Liy","newuser","profile","sbin","sh","share","ssh","sudo_logsrvd.conf","suid_profile","sy","usr","zlogin","zlogout","zprofile","zshenv","zshrc"
+    };
+    for(int i=0; i<sizeof(varfiles)/sizeof(varfiles[0]); i++) {
+        NSString* path=[NSString stringWithFormat:@"/var/%s", varfiles[i]];
+        if(access(path.UTF8String, F_OK)==0) {
+            NSLog(@"xina jb file found: %@", path);
+        }
+    }
 }
 
 void detect_kernBypass()
@@ -163,7 +173,19 @@ void detect_jb_payload()
     }
 }
 
-//#import "AppDelegate.h"
+#include <dirent.h>
+void detect_jb_preboot()
+{
+    struct statfs s={0};
+    statfs("/usr/standalone/firmware", &s);
+    printf("%s", s.f_mntfromname);
+    NSString* jbdir = [NSString stringWithFormat:@"%s/../../../procursus", s.f_mntfromname];
+    if(access(jbdir.UTF8String, F_OK)==0) {
+        NSLog(@"jb files in preboot!");
+    }
+}
+
+#import "AppDelegate.h"
 int main(int argc, char * argv[])
 {
     NSLog(@"Don't try to patch/hook me, it's a Kids's trick!");
@@ -177,12 +199,14 @@ int main(int argc, char * argv[])
     detect_jailbreakd();
     detect_proc_flags();
     detect_jb_payload();
+    detect_jb_preboot();
+
     
-//    NSString * appDelegateClassName;
-//    @autoreleasepool {
-//        // Setup code that might create autoreleased objects goes here.
-//        appDelegateClassName = NSStringFromClass([AppDelegate class]);
-//    }
-//    return UIApplicationMain(argc, argv, nil, appDelegateClassName);
+    NSString * appDelegateClassName;
+    @autoreleasepool {
+        // Setup code that might create autoreleased objects goes here.
+        appDelegateClassName = NSStringFromClass([AppDelegate class]);
+    }
+    return UIApplicationMain(argc, argv, nil, appDelegateClassName);
 
 }
