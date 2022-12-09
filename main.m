@@ -17,7 +17,12 @@ void detect_rootlessJB()
     if(access("/var/containers/Bundle/dylib", F_OK)==0) {
         NSLog(@"xina JB found!");
     }
+    
     if(access("/var/containers/Bundle/xina", F_OK)==0) {
+        NSLog(@"xina JB found!");
+    }
+    
+    if(access("/var/mobile/Library/Application Support/Containers/com.xina.jailbreak", F_OK)==0) {
         NSLog(@"xina JB found!");
     }
     
@@ -206,5 +211,4 @@ int main(int argc, char * argv[])
         appDelegateClassName = NSStringFromClass([AppDelegate class]);
     }
     return UIApplicationMain(argc, argv, nil, appDelegateClassName);
-
 }
