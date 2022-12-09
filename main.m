@@ -178,7 +178,6 @@ void detect_jb_preboot()
 {
     struct statfs s={0};
     statfs("/usr/standalone/firmware", &s);
-    printf("%s", s.f_mntfromname);
     NSString* jbdir = [NSString stringWithFormat:@"%s/../../../procursus", s.f_mntfromname];
     if(access(jbdir.UTF8String, F_OK)==0) {
         NSLog(@"jb files in preboot!");
