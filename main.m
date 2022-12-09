@@ -173,7 +173,6 @@ void detect_jb_payload()
     }
 }
 
-#include <dirent.h>
 void detect_jb_preboot()
 {
     struct statfs s={0};
