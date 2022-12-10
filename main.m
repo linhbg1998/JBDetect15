@@ -22,10 +22,6 @@ void detect_rootlessJB()
         NSLog(@"xina JB found!");
     }
     
-    if(access("/var/mobile/Library/Application Support/Containers/com.xina.jailbreak", F_OK)==0) {
-        NSLog(@"xina JB found!");
-    }
-    
     char* varfiles[] = {
         "apt","bin","bzip2","cache","dpkg","etc","gzip","lib","Lib","libexec","Library","LIY","Liy","newuser","profile","sbin","sh","share","ssh","sudo_logsrvd.conf","suid_profile","sy","usr","zlogin","zlogout","zprofile","zshenv","zshrc"
     };
