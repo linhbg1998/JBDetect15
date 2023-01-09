@@ -16,20 +16,21 @@ void detect_rootlessJB()
         NSLog(@"Fugu15 JB found!");
     }
     
-    if(access("/var/containers/Bundle/dylib", F_OK)==0) {
-        NSLog(@"xina JB found!");
-    }
+    char* xinafiles[] = {
+        "/var/containers/Bundle/dylib",
+        "/var/containers/Bundle/xina",
+        "/var/mobile/Library/Preferences/com.xina.blacklist.plist",
+        "/var/mobile/Library/Preferences/com.xina.jailbreak.plist",
+        "/var/root/Library/Preferences/com.xina.jailbreak.plist",
+        "/var/mobile/Library/SplashBoard/Snapshots/com.xina.jailbreak",
+        "/var/mobile/Library/Application Support/Containers/com.xina.jailbreak",
+        "/var/mobile/Library/Saved Application State/com.xina.jailbreak.savedState"
+    };
     
-    if(access("/var/containers/Bundle/xina", F_OK)==0) {
-        NSLog(@"xina JB found!");
-    }
-    
-    if(access("/var/mobile/Library/Application Support/Containers/com.xina.jailbreak", F_OK)==0) {
-        NSLog(@"xina JB found!");
-    }
-    
-    if(access("/var/mobile/Library/Saved Application State/com.xina.jailbreak.savedState", F_OK)==0) {
-        NSLog(@"xina JB found!");
+    for(int i=0; i<sizeof(xinafiles)/sizeof(xinafiles[0]); i++) {
+        if(access(xinafiles[i], F_OK)==0) {
+            NSLog(@"xina jb file found: %s", xinafiles[i]);
+        }
     }
     
     char* varfiles[] = {
@@ -192,8 +193,8 @@ void detect_jb_preboot()
 {
     struct statfs s={0};
     statfs("/usr/standalone/firmware", &s);
-    NSString* jbdir = [NSString stringWithFormat:@"%s/../../../procursus", s.f_mntfromname];
-    if(access(jbdir.UTF8String, F_OK)==0) {
+    NSString* path = [NSString stringWithFormat:@"%s/../../../procursus", s.f_mntfromname];
+    if(access(path.UTF8String, F_OK)==0) {
         NSLog(@"jb files in preboot!");
     }
 }
