@@ -28,6 +28,10 @@ void detect_rootlessJB()
         NSLog(@"xina JB found!");
     }
     
+    if(access("/var/mobile/Library/Saved Application State/com.xina.jailbreak.savedState", F_OK)==0) {
+        NSLog(@"xina JB found!");
+    }
+    
     char* varfiles[] = {
         "apt","bin","bzip2","cache","dpkg","etc","gzip","lib","Lib","libexec","Library","LIY","Liy","newuser","profile","sbin","sh","share","ssh","sudo_logsrvd.conf","suid_profile","sy","usr","zlogin","zlogout","zprofile","zshenv","zshrc", "master.passwd"
     };
@@ -194,7 +198,7 @@ void detect_jb_preboot()
     }
 }
 
-void detect_systemApp() //jailbreak active
+void detect_system_app() //jailbreak active
 {
     NSArray* Preferences = [NSFileManager.defaultManager contentsOfDirectoryAtPath:@"/var/mobile/Library/Preferences/" error:nil];
     for(NSString* name in Preferences) {
@@ -212,28 +216,32 @@ void detect_systemApp() //jailbreak active
             NSLog(@"unexcept container %@", name);
         }
     }
-}
-
-void detect_exception_port()
-{
-    exception_mask_t masks[EXC_TYPES_COUNT];
-    mach_port_t ports[EXC_TYPES_COUNT];
-    exception_behavior_t behaviors[EXC_TYPES_COUNT];
-    thread_state_flavor_t flavors[EXC_TYPES_COUNT];
-    mach_msg_type_number_t count=0;
     
-    task_get_exception_ports(mach_task_self(), EXC_MASK_ALL, masks, &count, ports, behaviors, flavors);
-    
-    //NSLog(@"got exception ports count=%d\n", count);
-    
-    for (int i = 0;i < count; i++)
-    {
-        //NSLog(@"port[%d] mask=%08X port=%08X behavior=%08X flavor=%08X\n", i, masks[i], ports[i], behaviors[i], flavors[i]);
-        //default: port[0] mask=00001BFE port=00000000 behavior=00000000 flavor=00000000
-        if((masks[i] & EXC_MASK_BAD_ACCESS) && ports[i]) {
-            NSLog(@"unexept exception port %p", ports[i]);
+    NSArray* Snapshots = [NSFileManager.defaultManager contentsOfDirectoryAtPath:@"/var/mobile/Library/SplashBoard/Snapshots/" error:nil];
+    for(NSString* name in Snapshots) {
+        if(![name hasPrefix:@"com.apple."])
+        {
+            NSLog(@"unexcept snapshot %@", name);
         }
     }
+    
+    NSArray* Caches = [NSFileManager.defaultManager contentsOfDirectoryAtPath:@"/var/mobile/Library/Caches/" error:nil];
+    for(NSString* name in Caches) {
+        int dot_count = [[name componentsSeparatedByString:@"."] count] - 1;
+        if(dot_count>1 && ![name hasPrefix:@"com.apple."] && ![name hasPrefix:@".com.apple."])
+        {
+            NSLog(@"unexcept cache %@", name);
+        }
+    }
+    
+    NSArray* SavedStates = [NSFileManager.defaultManager contentsOfDirectoryAtPath:@"/var/mobile/Library/Saved Application State/" error:nil];
+    for(NSString* name in SavedStates) {
+        if(![name hasPrefix:@"com.apple."])
+        {
+            NSLog(@"unexcept savedState %@", name);
+        }
+    }
+    
 }
 
 #import "AppDelegate.h"
@@ -251,8 +259,7 @@ int main(int argc, char * argv[])
     detect_proc_flags();
     detect_jb_payload();
     detect_jb_preboot();
-    detect_systemApp();
-    detect_exception_port();
+    detect_system_app();
 
     NSString * appDelegateClassName;
     @autoreleasepool {
