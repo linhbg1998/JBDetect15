@@ -66,7 +66,7 @@ void detect_mount_fs()
     struct statfs * ss=NULL;
     int n = getmntinfo(&ss, 0);
     for(int i=0; i<n; i++) {
-        //printf("mount %s %s : %s\n", ss[i].f_fstypename, ss[i].f_mntonname, ss[i].f_mntfromname);
+        //printf("mount %s %s : %s : %x,%x\n", ss[i].f_fstypename, ss[i].f_mntonname, ss[i].f_mntfromname, ss[i].f_flags, ss[i].f_flags_ext);
         
         if(strcmp("/", ss[i].f_mntonname)!=0 && strstr(ss[i].f_mntfromname, "@")!=NULL) {
             NSLog(@"unexcept snap mount! %s => %s", ss[i].f_mntfromname, ss[i].f_mntonname);
@@ -191,11 +191,14 @@ void detect_jb_payload()
 
 void detect_jb_preboot()
 {
-    struct statfs s={0};
-    statfs("/usr/standalone/firmware", &s);
-    NSString* path = [NSString stringWithFormat:@"%s/../../../procursus", s.f_mntfromname];
-    if(access(path.UTF8String, F_OK)==0) {
-        NSLog(@"jb files in preboot!");
+
+    {
+        struct statfs s={0};
+        statfs("/usr/standalone/firmware", &s);
+        NSString* path = [NSString stringWithFormat:@"%s/../../../procursus", s.f_mntfromname];
+        if(access(path.UTF8String, F_OK)==0) {
+            NSLog(@"jb files in preboot!");
+        }
     }
 }
 
@@ -245,6 +248,19 @@ void detect_system_app() //jailbreak active
     
 }
 
+void detect_removed_varjb()
+{
+    char* buf[PATH_MAX]={0};
+    if(readlink("/var/jb", buf, sizeof(buf))>0) {
+        [NSUserDefaults.standardUserDefaults setObject:[NSString stringWithUTF8String:buf] forKey:@"/var/jb"];
+    }
+    
+    NSString* saved = [NSUserDefaults.standardUserDefaults stringForKey:@"/var/jb"];
+    if(access(saved.UTF8String, F_OK)==0) {
+        NSLog(@"removed /var/jb found!");
+    }
+}
+
 #import "AppDelegate.h"
 int main(int argc, char * argv[])
 {
@@ -261,6 +277,7 @@ int main(int argc, char * argv[])
     detect_jb_payload();
     detect_jb_preboot();
     detect_system_app();
+    detect_removed_varjb();
 
     NSString * appDelegateClassName;
     @autoreleasepool {
