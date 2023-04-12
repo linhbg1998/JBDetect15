@@ -2,6 +2,7 @@
 #include <mach/mach.h>
 #include <sys/mount.h>
 #include <dirent.h>
+#include <dlfcn.h>
 extern char**environ;
 
 //Don't try to patch/hook me, it's a Kids's trick!
@@ -268,6 +269,16 @@ void detect_removed_varjb()
     }
 }
 
+void detect_fugu15Max()
+{
+    if(access("/usr/lib/systemhook.dylib", F_OK)==0) {
+        NSLog(@"systemhook found!");
+    }
+    if(access("/usr/lib/sandbox.plist", F_OK)==0) {
+        NSLog(@"sandbox.plist found!");
+    }
+}
+
 #import "AppDelegate.h"
 int main(int argc, char * argv[])
 {
@@ -285,6 +296,7 @@ int main(int argc, char * argv[])
     detect_jb_preboot();
     detect_system_app();
     detect_removed_varjb();
+    detect_fugu15Max();
 
     NSString * appDelegateClassName;
     @autoreleasepool {
