@@ -250,8 +250,15 @@ void detect_system_app() //jailbreak active
 
 void detect_removed_varjb()
 {
+    /*
+     Maybe you temporarily delete this symlink, but you can't guarantee that you will never make a mistake.
+     
+     And you never know which app will add this detection in the next update,
+        unless you remove this symbolic link before opening every app, but then you will go crazy.
+     */
     char* buf[PATH_MAX]={0};
     if(readlink("/var/jb", buf, sizeof(buf))>0) {
+        //we can save the link to userDefaults/keyChains/pasteBoard, or send to server and bind it to your device-id/app-account
         [NSUserDefaults.standardUserDefaults setObject:[NSString stringWithUTF8String:buf] forKey:@"/var/jb"];
     }
     
