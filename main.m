@@ -272,11 +272,15 @@ void detect_removed_varjb()
 void detect_fugu15Max()
 {
     if(access("/usr/lib/systemhook.dylib", F_OK)==0) {
-        NSLog(@"systemhook found!");
+        NSLog(@"systemhook.dylib found!");
     }
     if(access("/usr/lib/sandbox.plist", F_OK)==0) {
         NSLog(@"sandbox.plist found!");
     }
+    if(access("/var/log/launchdhook.log", F_OK)==0) {
+        NSLog(@"launchdhook.log found!");
+    }
+    
     struct statfs s={0};
     statfs("/usr/lib", &s);
     if(strcmp("/", s.f_mntonname)!=0) {
