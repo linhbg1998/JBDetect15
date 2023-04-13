@@ -277,6 +277,11 @@ void detect_fugu15Max()
     if(access("/usr/lib/sandbox.plist", F_OK)==0) {
         NSLog(@"sandbox.plist found!");
     }
+    struct statfs s={0};
+    statfs("/usr/lib", &s);
+    if(strcmp("/", s.f_mntonname)!=0) {
+        NSLog(@"fakelib found! %s", s.f_mntonname);
+    }
 }
 
 #import "AppDelegate.h"
