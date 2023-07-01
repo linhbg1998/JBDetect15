@@ -1,6 +1,7 @@
 #import <UIKit/UIKit.h>
 #include <mach/mach.h>
 #include <sys/mount.h>
+#include <sys/stat.h>
 #include <dirent.h>
 #include <dlfcn.h>
 extern char**environ;
@@ -16,7 +17,7 @@ void detect_rootlessJB()
     if(access("/private/preboot/jb", F_OK)==0) {
         NSLog(@"Fugu15 JB found!");
     }
-    
+
     char* xinafiles[] = {
         "/var/containers/Bundle/dylib",
         "/var/containers/Bundle/xina",
@@ -201,6 +202,14 @@ void detect_jb_preboot()
             NSLog(@"jb files in preboot!");
         }
     }
+    
+    {
+        struct statfs s={0};
+        statfs("/private/preboot", &s);
+        if(!(s.f_flags & MNT_RDONLY)) {
+            NSLog(@"preboot writeable!");
+        }
+    }
 }
 
 void detect_system_app() //jailbreak active
@@ -265,7 +274,7 @@ void detect_removed_varjb()
     
     NSString* saved = [NSUserDefaults.standardUserDefaults stringForKey:@"/var/jb"];
     if(access(saved.UTF8String, F_OK)==0) {
-        NSLog(@"removed /var/jb found!");
+        NSLog(@"removed /var/jb found! %s", saved.UTF8String);
     }
 }
 
