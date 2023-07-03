@@ -191,8 +191,6 @@ void detect_jb_payload()
     }
 }
 
-//some jailbreak will set launchd exception port
-//  and subproces will auto inherit it.
 void detect_exception_port()
 {
     exception_mask_t masks[EXC_TYPES_COUNT];
@@ -200,8 +198,10 @@ void detect_exception_port()
     exception_behavior_t behaviors[EXC_TYPES_COUNT];
     thread_state_flavor_t flavors[EXC_TYPES_COUNT];
     mach_msg_type_number_t count=0;
+    
+    mach_port_t task = mach_task_self();
 
-    task_get_exception_ports(mach_task_self(), EXC_MASK_ALL, masks, &count, ports, behaviors, flavors);
+    task_get_exception_ports(task, EXC_MASK_ALL, masks, &count, ports, behaviors, flavors);
 
     //NSLog(@"got exception ports count=%d\n", count);
 
@@ -209,6 +209,8 @@ void detect_exception_port()
     {
         //NSLog(@"port[%d] mask=%08X port=%08X behavior=%08X flavor=%08X\n", i, masks[i], ports[i], behaviors[i], flavors[i]);
         //default: port[0] mask=00001BFE port=00000000 behavior=00000000 flavor=00000000
+        //some jailbreak will set launchd exception port and subproces will auto inherit it.
+        //to restore it we can task_set_exception_ports(task, 0x00001BFE, MACH_PORT_NULL, 0, 0));
         if((masks[i] & EXC_MASK_BAD_ACCESS) && ports[i]) {
             NSLog(@"unexept exception port %08X", ports[i]);
         }
