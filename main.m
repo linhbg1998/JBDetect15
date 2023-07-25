@@ -245,34 +245,29 @@ void detect_jailbroken_apps()
         
     };
     
-    char* paths[] = {
-        "Library/Preferences",
-        "Library/Application Support/Containers",
-        "Library/SplashBoard/Snapshots",
-        "Library/Caches",
-        "Library/Saved Application State"
+    char* paths[][3] = {
+        {"","Library/Preferences",".plist"},
+        {"","Library/Application Support/Containers",""},
+        {"","Library/SplashBoard/Snapshots",""},
+        {"","Library/Caches",""},
+        {"","Library/Saved Application State",".savedState"},
+        {"","Library/WebKit",""},
+        {"","Library/Cookies",".binarycookies"},
+        {"","Library/HTTPStorages",""},
     };
-    char* paths_suffix[] = {
-        ".plist",
-        "",
-        "",
-        "",
-        ".savedState"
-    };
-    
     
     for(int i=0; i<sizeof(paths)/sizeof(paths[0]); i++) {
         for(int j=0; j<sizeof(appids)/sizeof(appids[0]); j++) {
-            NSString* mobile = [NSString stringWithFormat:@"/var/mobile/%s/%s%s", paths[i], appids[j], paths_suffix[i]];
+            NSString* mobile = [NSString stringWithFormat:@"/var/mobile/%s/%s%s%s", paths[i][1], appids[j], paths[i][0], paths[i][2]];
             if(access(mobile.fileSystemRepresentation, F_OK)==0) {
                 printf("jailbroken app found %s\n", mobile.UTF8String);
             }
-            NSString* root = [NSString stringWithFormat:@"/var/root/%s/%s%s", paths[i], appids[j], paths_suffix[i]];
+            NSString* root = [NSString stringWithFormat:@"/var/root/%s/%s%s%s", paths[i][1], appids[j], paths[i][0], paths[i][2]];
             if(access(root.fileSystemRepresentation, F_OK)==0) {
                 printf("jailbroken app found %s\n", root.UTF8String);
             }
         }
-    }    
+    }
 }
 
 void detect_removed_varjb()
