@@ -22,11 +22,6 @@ void detect_rootlessJB()
         "/var/containers/Bundle/dylib",
         "/var/containers/Bundle/xina",
         "/var/mobile/Library/Preferences/com.xina.blacklist.plist",
-        "/var/mobile/Library/Preferences/com.xina.jailbreak.plist",
-        "/var/root/Library/Preferences/com.xina.jailbreak.plist",
-        "/var/mobile/Library/SplashBoard/Snapshots/com.xina.jailbreak",
-        "/var/mobile/Library/Application Support/Containers/com.xina.jailbreak",
-        "/var/mobile/Library/Saved Application State/com.xina.jailbreak.savedState"
     };
     
     for(int i=0; i<sizeof(xinafiles)/sizeof(xinafiles[0]); i++) {
@@ -238,50 +233,46 @@ void detect_jb_preboot()
     }
 }
 
-void detect_system_app() //jailbreak active
+void detect_jailbroken_apps()
 {
-    NSArray* Preferences = [NSFileManager.defaultManager contentsOfDirectoryAtPath:@"/var/mobile/Library/Preferences/" error:nil];
-    for(NSString* name in Preferences) {
-        int dot_count = [[name componentsSeparatedByString:@"."] count] - 1;
-        if(dot_count>1 && ![name hasPrefix:@"."] && ![name hasPrefix:@"com.apple."] && ![name hasPrefix:@"systemgroup.com.apple."])
-        {
-            NSLog(@"unexcept preference %@", name);
-        }
-    }
+    char* appids[] = {
+        "com.xina.jailbreak",
+        "com.opa334.Dopamine",
+        "com.tigisoftware.Filza",
+        "org.coolstar.SileoStore",
+        "ws.hbang.Terminal",
+        "xyz.willy.Zebra",
+        
+    };
     
-    NSArray* ASContainers = [NSFileManager.defaultManager contentsOfDirectoryAtPath:@"/var/mobile/Library/Application Support/Containers/" error:nil];
-    for(NSString* name in ASContainers) {
-        if(![name hasPrefix:@"com.apple."])
-        {
-            NSLog(@"unexcept container %@", name);
-        }
-    }
+    char* paths[] = {
+        "Library/Preferences",
+        "Library/Application Support/Containers",
+        "Library/SplashBoard/Snapshots",
+        "Library/Caches",
+        "Library/Saved Application State"
+    };
+    char* paths_suffix[] = {
+        ".plist",
+        "",
+        "",
+        "",
+        ".savedState"
+    };
     
-    NSArray* Snapshots = [NSFileManager.defaultManager contentsOfDirectoryAtPath:@"/var/mobile/Library/SplashBoard/Snapshots/" error:nil];
-    for(NSString* name in Snapshots) {
-        if(![name hasPrefix:@"com.apple."])
-        {
-            NSLog(@"unexcept snapshot %@", name);
-        }
-    }
     
-    NSArray* Caches = [NSFileManager.defaultManager contentsOfDirectoryAtPath:@"/var/mobile/Library/Caches/" error:nil];
-    for(NSString* name in Caches) {
-        int dot_count = [[name componentsSeparatedByString:@"."] count] - 1;
-        if(dot_count>1 && ![name hasPrefix:@"com.apple."] && ![name hasPrefix:@".com.apple."])
-        {
-            NSLog(@"unexcept cache %@", name);
+    for(int i=0; i<sizeof(paths)/sizeof(paths[0]); i++) {
+        for(int j=0; j<sizeof(appids)/sizeof(appids[0]); j++) {
+            NSString* mobile = [NSString stringWithFormat:@"/var/mobile/%s/%s%s", paths[i], appids[j], paths_suffix[i]];
+            if(access(mobile.fileSystemRepresentation, F_OK)==0) {
+                printf("jailbroken app found %s\n", mobile.UTF8String);
+            }
+            NSString* root = [NSString stringWithFormat:@"/var/root/%s/%s%s", paths[i], appids[j], paths_suffix[i]];
+            if(access(root.fileSystemRepresentation, F_OK)==0) {
+                printf("jailbroken app found %s\n", root.UTF8String);
+            }
         }
-    }
-    
-    NSArray* SavedStates = [NSFileManager.defaultManager contentsOfDirectoryAtPath:@"/var/mobile/Library/Saved Application State/" error:nil];
-    for(NSString* name in SavedStates) {
-        if(![name hasPrefix:@"com.apple."])
-        {
-            NSLog(@"unexcept savedState %@", name);
-        }
-    }
-    
+    }    
 }
 
 void detect_removed_varjb()
@@ -339,7 +330,7 @@ int main(int argc, char * argv[])
     detect_exception_port();
     detect_jb_payload();
     detect_jb_preboot();
-    detect_system_app();
+    detect_jailbroken_apps();
     detect_removed_varjb();
     detect_fugu15Max();
 
