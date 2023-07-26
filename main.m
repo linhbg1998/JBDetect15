@@ -106,6 +106,14 @@ void detect_bootstraps()
     if(access("/var/lib/undecimus", F_OK)==0) {
         NSLog(@"unc0ver found!");
     }
+    
+    if(access("/var/mobile/Library/Sileo", F_OK)==0) {
+        NSLog(@"Sileo found!");
+    }
+    
+    if(access("/var/mobile/Library/Application Support/xyz.willy.Zebra", F_OK)==0) {
+        NSLog(@"Zebra found!");
+    }
 }
 
 void detect_trollStoredFilza()
@@ -309,11 +317,29 @@ void detect_fugu15Max()
     }
 }
 
+void detect_url_schemes()
+{
+    //jailbroken app's scheme doesn't need to define in Info.plist ?
+    char* schemes[] = {
+        "sileo",
+        "zbra",
+        "cydia",
+        "installer",
+        "apt-repo",
+        "filza",
+    };
+    
+    for(int i=0; i<sizeof(schemes)/sizeof(schemes[0]); i++) {
+        BOOL canOpen = [[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:[NSString stringWithFormat:@"%s://",schemes[i]]]];
+        if(canOpen) NSLog(@"URLScheme found: %s", schemes[i]);
+    }
+}
+
 #import "AppDelegate.h"
 int main(int argc, char * argv[])
 {
     NSLog(@"Don't try to patch/hook me, it's a Kids's trick!");
-    
+
     detect_rootlessJB();
     detect_kernBypass();
     detect_chroot();
@@ -328,6 +354,9 @@ int main(int argc, char * argv[])
     detect_jailbroken_apps();
     detect_removed_varjb();
     detect_fugu15Max();
+    dispatch_async(dispatch_get_main_queue(), ^{
+        detect_url_schemes();
+    });
 
     NSString * appDelegateClassName;
     @autoreleasepool {
